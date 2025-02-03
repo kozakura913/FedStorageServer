@@ -1,0 +1,189 @@
+package com.github.kozakura913.fedstorage;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+public class HttpServer extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private static final HashSet<String> files=new HashSet<>();
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		String path=request.getPathInfo();
+		if(path.startsWith("/api")) {
+			response.setHeader("Content-Type","application/json");
+			PrintWriter w = response.getWriter();
+			if(path.equals("/api/list/item_frequency.json")) {
+				item_frequency(w);
+			}else if(path.equals("/api/list/items.json")) {
+				items(w,request);
+			}else if(path.equals("/api/list/fluid_frequency.json")) {
+				fluid_frequency(w);
+			}else if(path.equals("/api/list/fluids.json")) {
+				fluids(w,request);
+			}
+			w.flush();
+			return;
+		}
+		if(path.endsWith(".html")) {
+			response.setHeader("Content-Type","text/html");
+		}else if(path.endsWith(".css")) {
+			response.setHeader("Content-Type","text/css");
+		}else if(path.endsWith(".js")) {
+			response.setHeader("Content-Type","text/javascript");
+		}else if(path.endsWith(".png")) {
+			response.setHeader("Content-Type","image/png");
+		}else if(path.endsWith(".svg")) {
+			response.setHeader("Content-Type","image/svg+xml");
+		}
+		path=path.substring(1);
+		if(path.contains("/")||path.startsWith(".")) {
+			response.setStatus(404);
+		}
+		if(path.isBlank())path="index.html";
+		if(files.contains(path)) {
+			FileInputStream fis = new FileInputStream(new File("html/"+path));
+			fis.transferTo(response.getOutputStream());
+			fis.close();
+		}
+		response.setStatus(404);
+	}
+	private void fluids(PrintWriter w, HttpServletRequest req) {
+		String freq=req.getParameter("frequency");
+		if(freq==null) {
+			w.append("[]");
+			return;
+		}
+		freq=freq.toUpperCase();
+		HashMap<String, FluidStack> freq_buffer = FedStorageServer.fluid_buffers.get(freq);
+		if(freq_buffer==null) {
+			w.append("[]");
+			return;
+		}
+		ArrayList<FluidStack> copy=new ArrayList<>();
+		synchronized(freq_buffer) {
+			copy.addAll(freq_buffer.values());
+		}
+		w.append("[\n");
+		boolean first=true;
+		for(FluidStack fs:copy) {
+			if(!first) {
+				w.append(",\n");
+			}else {
+				first=false;
+			}
+			w.append("{\"name\":\"").append(fs.name).append("\",\"count\":").append(Long.toString(fs.count)).append("}");
+		}
+		w.append("\n]");
+	}
+	private void fluid_frequency(Writer w) throws IOException {
+		class FreqEntry{
+			String id;
+			int size;
+		}
+		ArrayList<FreqEntry> copy=new ArrayList<>();
+		synchronized(FedStorageServer.fluid_buffers) {
+			for(Entry<String, HashMap<String, FluidStack>> e:FedStorageServer.fluid_buffers.entrySet()) {
+				FreqEntry fe = new FreqEntry();
+				fe.id=e.getKey();
+				fe.size=e.getValue().size();
+				copy.add(fe);
+			}
+		}
+		w.append("[\n");
+		boolean first=true;
+		for(FreqEntry fe:copy) {
+			if(!first) {
+				w.append(",\n");
+			}else {
+				first=false;
+			}
+			w.append("{\"id\":\"").append(fe.id).append("\",\"size\":").append(Integer.toString(fe.size)).append("}");
+		}
+		w.append("\n]");
+	}
+	private void item_frequency(Writer w) throws IOException {
+		class FreqEntry{
+			String id;
+			int size;
+		}
+		ArrayList<FreqEntry> copy=new ArrayList<>();
+		synchronized(FedStorageServer.item_buffers) {
+			for(Entry<String, ArrayList<ItemStack>> e:FedStorageServer.item_buffers.entrySet()) {
+				FreqEntry fe = new FreqEntry();
+				fe.id=e.getKey();
+				fe.size=e.getValue().size();
+				copy.add(fe);
+			}
+		}
+		w.append("[\n");
+		boolean first=true;
+		for(FreqEntry fe:copy) {
+			if(!first) {
+				w.append(",\n");
+			}else {
+				first=false;
+			}
+			w.append("{\"id\":\"").append(fe.id).append("\",\"size\":").append(Integer.toString(fe.size)).append("}");
+		}
+		w.append("\n]");
+	}
+	private void items(Writer w,HttpServletRequest req) throws IOException {
+		String freq=req.getParameter("frequency");
+		if(freq==null) {
+			w.append("[]");
+			return;
+		}
+		freq=freq.toUpperCase();
+		ArrayList<ItemStack> freq_buffer = FedStorageServer.item_buffers.get(freq);
+		if(freq_buffer==null) {
+			w.append("[]");
+			return;
+		}
+		ArrayList<ItemStack> copy;
+		synchronized(freq_buffer) {
+			copy=(ArrayList<ItemStack>) freq_buffer.clone();
+		}
+		w.append("[\n");
+		boolean first=true;
+		for(ItemStack is:copy) {
+			if(!first) {
+				w.append(",\n");
+			}else {
+				first=false;
+			}
+			w.append("{\"name\":\"").append(is.name).append("\",\"count\":").append(Integer.toString(is.count)).append("}");
+		}
+		w.append("\n]");
+	}
+	public static void start() {
+		for(String file:new File("html").list()) {
+			files.add(file);
+		}
+		Server server = new Server(3031);
+		ServletContextHandler context = new ServletContextHandler("/",ServletContextHandler.SESSIONS);
+		context.setWelcomeFiles(new String[] { "index.html" });
+		context.addServlet( new ServletHolder( new HttpServer()), "/*");
+		server.setHandler(context);
+		try {
+			server.start();
+			System.out.println("ServerStart");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
