@@ -18,10 +18,11 @@ public class FedStorageServer {
 	static HashMap<String,ArrayList<ItemStack>> item_buffers=new HashMap<>();
 	static HashMap<String,HashMap<String,FluidStack>> fluid_buffers=new HashMap<>();
 	private static final long VERSION=3;
+	private static final String VERSION_STRING="3.2";
 
 	public static void main(String[] args) throws IOException {
 		try (ServerSocket server = new java.net.ServerSocket(3030)) {
-			System.out.println("ServerStart!");
+			System.out.println("ServerStart! v"+VERSION_STRING);
 			new Thread(HttpServer::start).start();
 			while(true) {
 				Socket soc = server.accept();
@@ -155,14 +156,13 @@ public class FedStorageServer {
 		try {
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
 			byte[] result = md5.digest(bb);
-			int[] i = new int[result.length];
 			StringBuffer sb = new StringBuffer();
 			for (int j=0; j < result.length; j++){
-				i[j] = (int)result[j] & 0xff;
-				if (i[j]<=15){
+				int i = (int)result[j] & 0xff;
+				if (i<=15){
 					sb.append("0");
 				}
-				sb.append(Integer.toHexString(i[j]));
+				sb.append(Integer.toHexString(i));
 			}
 			return sb.toString();
 		} catch (NoSuchAlgorithmException e) {

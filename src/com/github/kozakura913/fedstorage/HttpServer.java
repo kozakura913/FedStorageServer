@@ -86,7 +86,21 @@ public class HttpServer extends HttpServlet {
 			}else {
 				first=false;
 			}
-			w.append("{\"name\":\"").append(fs.name).append("\",\"count\":").append(Long.toString(fs.count)).append("}");
+			StringBuffer nbt = new StringBuffer();
+			if(fs.nbt==null) {
+				nbt.append("null");
+			}else {
+				nbt.append("\"");
+				for (int j=0; j < fs.nbt.length; j++){
+					int i = (int)fs.nbt[j] & 0xff;
+					if (i<=15){
+						nbt.append("0");
+					}
+					nbt.append(Integer.toHexString(i));
+				}
+				nbt.append("\"");
+			}
+			w.append("{\"name\":\"").append(fs.name).append("\",\"count\":").append(Long.toString(fs.count)).append(",\"nbt\":").append(nbt).append("}");
 		}
 		w.append("\n]");
 	}
@@ -166,7 +180,21 @@ public class HttpServer extends HttpServlet {
 			}else {
 				first=false;
 			}
-			w.append("{\"name\":\"").append(is.name).append("\",\"count\":").append(Integer.toString(is.count)).append("}");
+			StringBuffer nbt = new StringBuffer();
+			if(is.nbt==null) {
+				nbt.append("null");
+			}else {
+				nbt.append("\"");
+				for (int j=0; j < is.nbt.length; j++){
+					int i = (int)is.nbt[j] & 0xff;
+					if (i<=15){
+						nbt.append("0");
+					}
+					nbt.append(Integer.toHexString(i));
+				}
+				nbt.append("\"");
+			}
+			w.append("{\"name\":\"").append(is.name).append("\",\"count\":").append(Integer.toString(is.count)).append(",\"nbt\":").append(nbt).append("}");
 		}
 		w.append("\n]");
 	}
