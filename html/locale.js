@@ -49,7 +49,7 @@ const localeText = {
         fluidChannelHeader: "チャンネル",
         fluidNameHeader: "液体名",
         fluidAmountHeader: "液体量",
-        queueIdHeader: "順序番号",
+        modIdHeader: "Mod ID",
         nameHeader: "アイテムID",
         amountHeader: "量"
     },
@@ -62,7 +62,7 @@ const localeText = {
         fluidChannelHeader: "Channel",
         fluidNameHeader: "Fluid Name",
         fluidAmountHeader: "Fluid Amount",
-        queueIdHeader: "Queue num",
+        modIdHeader: "Mod ID",
         nameHeader: "Item ID",
         amountHeader: "Amount"
     }

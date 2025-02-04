@@ -3,7 +3,7 @@ const freq = new URLSearchParams(window.location.search).get('freq');
 // ロケールによって表示するテキストを変更する
 window.addEventListener("load", function () {
     document.getElementById('item-info-title').innerText = localeText[locale].itemDetailInfoTitle;
-    document.getElementById('queueId-header').innerText = localeText[locale].queueIdHeader;
+    document.getElementById('modId-header').innerText = localeText[locale].modIdHeader;
     document.getElementById('name-header').innerText = localeText[locale].nameHeader;
     document.getElementById('amount-header').innerText = localeText[locale].amountHeader;
 
@@ -39,9 +39,10 @@ async function fetchItem() {
         if (!cell1) cell1 = row.insertCell(0);
         if (!cell2) cell2 = row.insertCell(1);
         if (!cell3) cell3 = row.insertCell(2);
-        cell1.innerHTML = `#${position}`;
+        const split=String(item.name).split(":");
+        cell1.innerHTML = split[0];
         cell1.classList.add('right-align');
-        cell2.innerHTML = item.name
+        cell2.innerHTML = split[1];
         cell3.innerHTML = item.count.toLocaleString();
         cell3.classList.add('right-align');
         position++;
