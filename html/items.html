@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>Item list</title>
     <link rel="stylesheet" type="text/css" href="index.css">
     <link rel="stylesheet" type="text/css" href="freq-color.css">
     <script src="locale.js"></script>
@@ -12,15 +12,20 @@
     <div class="language-switcher">
         <button onclick="switchLanguage()"><img src="language-hiragana.svg"/></button>
     </div>
+    <div class="home-button">
+        <button onclick="ReturnToHome()"><img src="home.svg"/></button>
+    </div>
     <div class="container">
         <h1 id="item-info-title"></h1>
+        <h2 id="channel-title"></h2>
         <div class="resizable">
             <div class="item-table">
                 <table id="item-list" class="fixed-header">
                     <thead>
                         <tr>
-                            <th id="channel-header"></th>
-                            <th id="queue-header" style="width: 150px;"></th>
+                            <th id="queueId-header" style="width: 100px;"></th>
+                            <th id="name-header"></th>
+                            <th id="amount-header" style="width: 150px;"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,7 +35,8 @@
             </div>
         </div>
     </div>
-    <script src="index.js"></script>
+    
+    <script src="items.js"></script>
 </body>
 
 </html>
