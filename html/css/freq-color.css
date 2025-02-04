@@ -1,0 +1,81 @@
+.freq {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    text-align: center;
+    line-height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    align-items: center;
+    justify-content: center;
+}
+
+.txt.freq-guide {
+    font-size: 0.5em;
+    justify-content: center;
+}
+
+.freq.white {
+    background-color: #FFFFFF;
+}
+
+.freq.orange {
+    background-color: #C06300;
+}
+
+.freq.magenta {
+    background-color: #B51AB5;
+}
+
+.freq.light_blue {
+    background-color: #6F84F1;
+}
+
+.freq.yellow {
+    background-color: #BFBF00;
+}
+
+.freq.lime {
+    background-color: #6BF100;
+}
+
+.freq.pink {
+    background-color: #F14675;
+}
+
+.freq.gray {
+    background-color: #535353;
+}
+
+.freq.light_gray {
+    background-color: #939393;
+}
+
+.freq.cyan {
+    background-color: #008787;
+}
+
+.freq.purple {
+    background-color: #5E00C0;
+}
+
+.freq.blue {
+    background-color: #1313C0;
+}
+
+.freq.brown {
+    background-color: #4F2700;
+}
+
+.freq.green {
+    background-color: #088700;
+}
+
+.freq.red {
+    background-color: #A20F06;
+}
+
+.freq.black {
+    background-color: #1F1F1F;
+}

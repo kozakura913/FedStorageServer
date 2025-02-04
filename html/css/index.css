@@ -1,0 +1,131 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 10px;
+
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    margin: 0;
+    padding: 0px;
+    overflow-y: auto;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2;
+    text-align: center;
+    z-index: 1;
+}
+tbody td {
+    text-align: left;
+}
+
+tbody td[data-type="number"] {
+    text-align: right;
+}
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.item-table, .fluid-table {
+    position: relative;
+}
+
+.resizable {
+    height: 300px;
+    min-height: 300px;
+    max-height: max(300px, 60vh);
+    resize: vertical;
+    overflow: auto;
+    border: black 1px solid;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.diff-value{
+    font-size: 0.75em; 
+    display: inline-block;
+    width: 30px;
+    text-align: left;
+}
+
+.diff-value.add {
+    color: green;
+}
+.diff-value.sub {
+    color: red;
+}
+.diff-value.zero {
+    color: black;
+}
+
+.language-switcher {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}
+
+.language-switcher button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.home-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+
+.home-button button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+h2 {
+    text-align: center;
+    color: #333;
+}
+h2 p{
+    margin: 0;
+    padding: 0;
+}

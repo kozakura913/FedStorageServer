@@ -1,5 +1,55 @@
-<html>
-	<body>
-		<h1>WIP</h1>
-	</body>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="css/freq-color.css">
+    <script src="js/locale.js"></script>
+</head>
+
+<body>
+    <div class="language-switcher">
+        <button onclick="switchLanguage()"><img src="svg/language-hiragana.svg"/></button>
+    </div>
+    <div class="container">
+        <h1 id="item-info-title"></h1>
+        <div class="resizable">
+            <div class="item-table">
+                <table id="item-list" class="fixed-header">
+                    <thead>
+                        <tr>
+                            <th id="channel-header"></th>
+                            <th id="queue-header" style="width: 150px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="visibility: collapse;">
+        <h1 id="fluid-info-title"></h1>
+        <div class="resizable">
+            <div class="fluid-table">
+                <table id="fluid-list" class="fixed-header">
+                    <thead>
+                        <tr>
+                            <th id="fluid-channel-header"></th>
+                            <th id="fluid-name-header"></th>
+                            <th id="fluid-amount-header"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="js/index.js"></script>
+</body>
+
 </html>
