@@ -9,7 +9,7 @@ window.addEventListener("load", function () {
 
     const f = freq.toLocaleLowerCase();
     const ids = f.split(',').map(id => `<div class="freq ${id}"></div>`).join('');
-    const text = f.split(',').map(id => enumColour[id][locale] || id).join(', ');
+    const text = f.split(',').map(id => localeColour[locale][id] || id).join(', ');
     document.getElementById('channel-title').innerHTML = ids + `<p class="txt freq-guide">${text}</p>`;;
 });
 

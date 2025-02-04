@@ -1,21 +1,41 @@
 
-const enumColour = {
-    white: {ja:"白",en:"White"},
-    orange: {ja:"橙",en:"Orange"},
-    magenta: {ja:"赤紫",en:"Magenta"},
-    light_blue: {ja:"空",en:"Light Blue"},
-    yellow: {ja:"黄",en:"Yellow"},
-    lime: {ja:"黄緑",en:"Lime"},
-    pink: {ja:"桃",en:"Pink"},
-    gray: {ja:"灰",en:"Gray"},
-    light_gray: {ja:"薄灰",en:"Light Gray"},
-    cyan: {ja:"青緑",en:"Cyan"},
-    purple: {ja:"紫",en:"Purple"},
-    blue: {ja:"青",en:"Blue"},
-    brown: {ja:"茶",en:"Brown"},
-    green: {ja:"緑",en:"Green"},
-    red: {ja:"赤",en:"Red"},
-    black: {ja:"黒",en:"Black"},
+const localeColour = {
+    ja : {
+        white: "白",
+        orange: "橙",
+        magenta: "赤紫",
+        light_blue: "空",
+        yellow: "黄",
+        lime: "黄緑",
+        pink: "桃",
+        gray: "灰",
+        light_gray: "薄灰",
+        cyan: "青緑",
+        purple: "紫",
+        blue: "青",
+        brown: "茶",
+        green: "緑",
+        red: "赤",
+        black: "黒"
+    },
+    en : {
+        white: "White",
+        orange: "Orange",
+        magenta: "Magenta",
+        light_blue: "Light Blue",
+        yellow: "Yellow",
+        lime: "Lime",
+        pink: "Pink",
+        gray: "Gray",
+        light_gray: "Light Gray",
+        cyan: "Cyan",
+        purple: "Purple",
+        blue: "Blue",
+        brown: "Brown",
+        green: "Green",
+        red: "Red",
+        black: "Black"
+    }
 };
 
 
@@ -64,4 +84,3 @@ function ReturnToHome() {
     const lang = url.searchParams.get('lang') || 'en';
     window.location.href = `/?lang=${lang}`;
 }
-

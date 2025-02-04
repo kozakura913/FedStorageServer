@@ -31,7 +31,7 @@ async function fetchItem() {
         if (!cell2) cell2 = row.insertCell(1);
 
         const ids = item.id.split(',').map(id => `<div class="freq ${id}"></div>`).join('');
-        const localeText = item.id.split(',').map(id => enumColour[id][locale] || id).join(', ');
+        const localeText = item.id.split(',').map(id => localeColour[locale][id] || id).join(', ');
         cell1.innerHTML = `<a href="/items.html?freq=${item.id.toUpperCase()}&lang=${locale}">`+ids + '</a> ' + `<span class="txt freq-guide">${localeText}</span>`;
 
         const previousItem = previousItemData[index] || {};
