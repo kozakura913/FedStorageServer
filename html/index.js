@@ -30,7 +30,6 @@ async function fetchItem() {
         if (!cell1) cell1 = row.insertCell(0);
         if (!cell2) cell2 = row.insertCell(1);
 
-        // IDをコンマで分割し、正方形として表示し、Colourで定義されたロケールに置き換えて文字で表示
         const ids = item.id.split(',').map(id => `<div class="freq ${id}"></div>`).join('');
         const localeText = item.id.split(',').map(id => enumColour[id][locale] || id).join(', ');
         cell1.innerHTML = `<a href="/items.html?freq=${item.id.toUpperCase()}&lang=${locale}">`+ids + '</a> ' + `<span class="txt freq-guide">${localeText}</span>`;
@@ -46,43 +45,9 @@ async function fetchItem() {
     previousItemData = data;
 }
 
-async function fetchFluid() {
-    const response = await fetch('/api/getAllFreqFluid');
-    const data = await response.json();
-    const table = document.getElementById('fluid-list').getElementsByTagName('tbody')[0];
-
-    // 行数を調整
-    while (table.rows.length < data.length) {
-        table.insertRow();
-    }
-    while (table.rows.length > data.length) {
-        table.deleteRow(-1);
-    }
-
-    // 行を上から書き換え
-    data.forEach((item, index) => {
-        const row = table.rows[index];
-        let cell1 = row.cells[0];
-        let cell2 = row.cells[1];
-        let cell3 = row.cells[2];
-        if (!cell1) cell1 = row.insertCell(0);
-        if (!cell2) cell2 = row.insertCell(1);
-        if (!cell3) cell3 = row.insertCell(2);
-        cell1.innerHTML = item.channel;
-        cell2.innerHTML = item.fluidName;
-        cell3.innerHTML = item.amount;
-        cell3.classList.add('right-align');
-    });
-}
-
-async function fetchData() {
-    await fetchItem();
-    //await fetchFluid();
-}
-
 window.onload = function () {
-    fetchData();
-    setInterval(fetchData, 1000); // 1秒毎にfetchDataを実行
+    fetchItem();
+    setInterval(fetchItem, 1000); // 1秒毎にfetchDataを実行
 };
 
 // Resizable table container

@@ -53,7 +53,6 @@ async function fetchItem() {
 
 async function fetchData() {
     await fetchItem();
-    //await fetchFluid();
 }
 
 window.onload = function () {

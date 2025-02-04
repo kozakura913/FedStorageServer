@@ -1,16 +1,16 @@
-<!DOCTYPE html>
 <html lang="ja">
 
 <head>
+    <meta charset="UTF-8">
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="css/index.css">
-    <link rel="stylesheet" type="text/css" href="css/freq-color.css">
-    <script src="js/locale.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="freq-color.css">
+    <script src="locale.js"></script>
 </head>
 
 <body>
     <div class="language-switcher">
-        <button onclick="switchLanguage()"><img src="svg/language-hiragana.svg"/></button>
+        <button onclick="switchLanguage()"><img src="language-hiragana.svg"/></button>
     </div>
     <div class="container">
         <h1 id="item-info-title"></h1>
@@ -30,26 +30,7 @@
             </div>
         </div>
     </div>
-    <div class="container" style="visibility: collapse;">
-        <h1 id="fluid-info-title"></h1>
-        <div class="resizable">
-            <div class="fluid-table">
-                <table id="fluid-list" class="fixed-header">
-                    <thead>
-                        <tr>
-                            <th id="fluid-channel-header"></th>
-                            <th id="fluid-name-header"></th>
-                            <th id="fluid-amount-header"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows will be added dynamically here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <script src="js/index.js"></script>
+    <script src="index.js"></script>
 </body>
 
 </html>
