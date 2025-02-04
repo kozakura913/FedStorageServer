@@ -1,11 +1,19 @@
 package com.github.kozakura913.fedstorage;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -56,9 +64,16 @@ public class HttpServer extends HttpServlet {
 		}
 		if(path.isBlank())path="index.html";
 		if(files.contains(path)) {
-			FileInputStream fis = new FileInputStream(new File("html/"+path));
-			fis.transferTo(response.getOutputStream());
-			fis.close();
+			URL res = HttpServer.class.getClassLoader().getResource("com/github/kozakura913/fedstorage/html/"+path);
+			if(res==null) {
+				response.setStatus(404);
+			}else {
+				try(InputStream is=res.openStream()){
+					is.transferTo(response.getOutputStream());
+				}
+			}
+		}else {
+			response.setStatus(404);
 		}
 	}
 	private void fluids(PrintWriter w, HttpServletRequest req) {
@@ -198,8 +213,30 @@ public class HttpServer extends HttpServlet {
 		w.append("\n]");
 	}
 	public static void start() {
-		for(String file:new File("html").list()) {
-			files.add(file);
+		String[] src = new File("src/com/github/kozakura913/fedstorage/html").list();
+		if(src!=null&&src.length>0) {
+			try (FileOutputStream list_txt = new FileOutputStream("src/com/github/kozakura913/fedstorage/html/list.txt")){
+				for(String file:src) {
+					list_txt.write((file+"\n").getBytes("UTF-8"));
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		URL res = HttpServer.class.getClassLoader().getResource("com/github/kozakura913/fedstorage/html/list.txt");
+		if(res==null) {
+			System.out.println("FrontendResource notfound");
+		}else {
+			try(InputStream is = res.openStream()){
+				BufferedReader br = new BufferedReader(new InputStreamReader(is));
+				while(true) {
+					String line=br.readLine();
+					if(line==null)break;
+					files.add(line);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		Server server = new Server(3031);
 		ServletContextHandler context = new ServletContextHandler("/",ServletContextHandler.SESSIONS);

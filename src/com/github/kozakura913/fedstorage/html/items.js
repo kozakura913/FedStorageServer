@@ -13,6 +13,14 @@ window.addEventListener("load", function () {
     document.getElementById('channel-title').innerHTML = ids + `<p class="txt freq-guide">${text}</p>`;;
 });
 
+function sortBy(sort_by){
+    const current_sort_by=new URLSearchParams(window.location.search).get('sort_by');
+    const parms=new URLSearchParams(window.location.search);
+    if(current_sort_by!=sort_by)parms.set("sort_by",sort_by);
+    else parms.delete("sort_by");
+    const url = new URL(window.location.pathname+"?"+parms,window.location.href);
+    window.location.href = url.toString();
+}
 
 async function fetchItem() {
     const url = new URL('/api/list/items.json', window.location.origin);
@@ -28,9 +36,21 @@ async function fetchItem() {
     while (table.rows.length > data.length) {
         table.deleteRow(-1);
     }
-
+    const sort_by=new URLSearchParams(window.location.search).get('sort_by');
+    if(sort_by==="count"){
+        data.sort((a,b)=>a.count-b.count);
+    }else if(sort_by==="name"){
+        data.sort((a,b)=>{
+            const a_name=String(a.name).split(":");
+            const b_name=String(b.name).split(":");
+            return (b_name[1]+b_name[0])>(a_name[1]+a_name[0])?-1:1;
+        });
+    }if(sort_by==="modid"){
+        const a_name=String(a.name).split(":");
+        const b_name=String(b.name).split(":");
+        return b_name[0]>a_name[0]?-1:1;
+    }
     // 行を上から書き換え
-    var position = 1;
     data.forEach((item, index) => {
         const row = table.rows[index];
         let cell1 = row.cells[0];
@@ -45,7 +65,6 @@ async function fetchItem() {
         cell2.innerHTML = split[1];
         cell3.innerHTML = item.count.toLocaleString();
         cell3.classList.add('right-align');
-        position++;
     });
 
     // 現在のデータを保存

@@ -78,7 +78,6 @@ function switchLanguage() {
     window.location.href = url.toString();
 }
 
-
 function ReturnToHome() {
     const url = new URL(window.location.href);
     const lang = url.searchParams.get('lang') || 'en';
