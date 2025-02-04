@@ -60,7 +60,6 @@ public class HttpServer extends HttpServlet {
 			fis.transferTo(response.getOutputStream());
 			fis.close();
 		}
-		response.setStatus(404);
 	}
 	private void fluids(PrintWriter w, HttpServletRequest req) {
 		String freq=req.getParameter("frequency");
