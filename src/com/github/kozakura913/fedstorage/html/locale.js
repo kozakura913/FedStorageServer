@@ -53,7 +53,8 @@ const localeText = {
         nameHeader: "アイテムID",
         amountHeader: "量",
         fluidNameHeader: "液体ID",
-        fluidAmountHeader: "量"
+        fluidAmountHeader: "量",
+        fluidTypeHeader: "種類"
     },
     en: {
         itemInfoTitle: "Item Information",
@@ -68,7 +69,8 @@ const localeText = {
         nameHeader: "Item ID",
         amountHeader: "Amount",
         fluidNameHeader: "Fluid ID",
-        fluidAmountHeader: "Amount"
+        fluidAmountHeader: "Amount",
+        fluidTypeHeader: "Types"
     }
 };
 

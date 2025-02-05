@@ -6,7 +6,7 @@ window.addEventListener("load", function () {
     document.getElementById('queue-header').innerText = localeText[locale].queueHeader;
     document.getElementById('fluid-info-title').innerText = localeText[locale].fluidInfoTitle;
     document.getElementById('fluid-channel-header').innerText = localeText[locale].fluidChannelHeader;
-    document.getElementById('fluid-amount-header').innerText = localeText[locale].fluidAmountHeader;
+    document.getElementById('fluid-type-header').innerText = localeText[locale].fluidTypeHeader;
 });
 async function fetchItem() {
     const response = await fetch('/api/list/item_frequency.json');
