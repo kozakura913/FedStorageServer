@@ -28,7 +28,7 @@ public class FedStorageServer {
 	static HashMap<String,ArrayList<ItemStack>> item_buffers=new HashMap<>();
 	static HashMap<String,HashMap<String,FluidStack>> fluid_buffers=new HashMap<>();
 	private static final long VERSION=3;
-	private static final String VERSION_STRING="3.4";
+	private static final String VERSION_STRING="3.6";
 
 	public static void main(String[] args) throws IOException {
 		new Thread(FedStorageServer::server,"Server").start();
