@@ -43,28 +43,34 @@ const localeText = {
     ja: {
         itemInfoTitle: "アイテム情報",
         itemDetailInfoTitle: "チャンネル内アイテム情報",
+        fluidDetailInfoTitle: "チャンネル内液体情報",
         channelHeader: "チャンネル",
         queueHeader: "待ちキュー数",
         fluidInfoTitle: "液体情報",
         fluidChannelHeader: "チャンネル",
-        fluidNameHeader: "液体名",
-        fluidAmountHeader: "液体量",
+        fluidAmountHeader: "液体種類",
         modIdHeader: "Mod ID",
         nameHeader: "アイテムID",
-        amountHeader: "量"
+        amountHeader: "量",
+        fluidNameHeader: "液体ID",
+        fluidAmountHeader: "量",
+        fluidTypeHeader: "種類"
     },
     en: {
         itemInfoTitle: "Item Information",
         itemDetailInfoTitle: "Item Detail Infomation",
+        fluidDetailInfoTitle: "Fluid Detail Infomation",
         channelHeader: "Channel",
         queueHeader: "Queue Size",
         fluidInfoTitle: "Fluid Information",
         fluidChannelHeader: "Channel",
-        fluidNameHeader: "Fluid Name",
-        fluidAmountHeader: "Fluid Amount",
+        fluidAmountHeader: "Fluid Type",
         modIdHeader: "Mod ID",
         nameHeader: "Item ID",
-        amountHeader: "Amount"
+        amountHeader: "Amount",
+        fluidNameHeader: "Fluid ID",
+        fluidAmountHeader: "Amount",
+        fluidTypeHeader: "Types"
     }
 };
 
