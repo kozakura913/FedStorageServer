@@ -43,7 +43,7 @@ const localeText = {
     ja: {
         itemInfoTitle: "アイテム情報",
         itemDetailInfoTitle: "チャンネル内アイテム情報",
-        fluidDetailInfoTitle: "チャンネル内アイテム情報",
+        fluidDetailInfoTitle: "チャンネル内液体情報",
         channelHeader: "チャンネル",
         queueHeader: "待ちキュー数",
         fluidInfoTitle: "液体情報",
