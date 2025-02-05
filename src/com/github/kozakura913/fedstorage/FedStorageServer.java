@@ -1,15 +1,25 @@
 package com.github.kozakura913.fedstorage;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,6 +31,43 @@ public class FedStorageServer {
 	private static final String VERSION_STRING="3.4";
 
 	public static void main(String[] args) throws IOException {
+		new Thread(FedStorageServer::server,"Server").start();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		while(true) {
+			String command=reader.readLine();
+			if("save".equals(command)) {
+				System.out.println("saveing...");
+				long start=System.currentTimeMillis();
+				try(GZIPOutputStream gzf = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream("save.dat.gz")))){
+					save(gzf);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println("saved "+(System.currentTimeMillis()-start)+"ms");
+			}else if("load".equals(command)) {
+				System.out.println("loading...");
+				long start=System.currentTimeMillis();
+				try(GZIPInputStream gzf = new GZIPInputStream(new BufferedInputStream(new FileInputStream("save.dat.gz")))){
+					load(gzf);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println("loaded "+(System.currentTimeMillis()-start)+"ms");
+			}else if("stop".equals(command)) {
+				System.out.println("Save And Exit...");
+				try(GZIPInputStream gzf = new GZIPInputStream(new BufferedInputStream(new FileInputStream("save.dat.gz")))){
+					load(gzf);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println("Bye");
+				System.exit(0);
+			}else {
+				System.out.println("Command Not Found");
+			}
+		}
+	}
+	private static void server() {
 		try (ServerSocket server = new java.net.ServerSocket(3030)) {
 			System.out.println("ServerStart! v"+VERSION_STRING);
 			new Thread(HttpServer::start).start();
@@ -37,7 +84,89 @@ public class FedStorageServer {
 					}
 				}).start();
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+	}
+	private static void load(GZIPInputStream gzf) throws IOException {
+		DataInputStream dis = new DataInputStream(gzf);
+		synchronized(fluid_buffers) {
+			fluid_buffers.clear();
+			int fluid_freq_count=dis.readInt();
+			for(int freq=0;freq<fluid_freq_count;freq++) {
+				String id=dis.readUTF();
+				HashMap<String, FluidStack> freq_buffer=new HashMap<>();
+				int stacks=dis.readInt();
+				for(int f=0;f<stacks;f++) {
+					FluidStack fs = new FluidStack();
+					fs.id=dis.readUTF();
+					fs.name=dis.readUTF();
+					fs.count=dis.readLong();
+					fs.nbt=new byte[dis.readInt()];
+					dis.readFully(fs.nbt);
+					freq_buffer.put(fs.id,fs);
+				}
+				fluid_buffers.put(id,freq_buffer);
+			}
+		}
+		synchronized(item_buffers) {
+			item_buffers.clear();
+			int fluid_freq_count=dis.readInt();
+			for(int freq=0;freq<fluid_freq_count;freq++) {
+				String id=dis.readUTF();
+				ArrayList<ItemStack> freq_buffer=new ArrayList<>();
+				int stacks=dis.readInt();
+				for(int f=0;f<stacks;f++) {
+					ItemStack is = new ItemStack();
+					is.name=dis.readUTF();
+					is.count=(int) Math.min(dis.readLong(),Integer.MAX_VALUE);
+					is.damage=dis.readInt();
+					is.nbt=new byte[dis.readInt()];
+					dis.readFully(is.nbt);
+					freq_buffer.add(is);
+				}
+				item_buffers.put(id,freq_buffer);
+			}
+		}
+	}
+	private static void save(GZIPOutputStream gzf) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(baos);
+		synchronized(fluid_buffers) {
+			dos.writeInt(fluid_buffers.size());
+			for(Entry<String, HashMap<String, FluidStack>> freq_buffer:fluid_buffers.entrySet()) {
+				dos.writeUTF(freq_buffer.getKey());
+				HashMap<String, FluidStack> map = freq_buffer.getValue();
+				dos.writeInt(map.size());
+				for(FluidStack fs:map.values()) {
+					dos.writeUTF(fs.id);
+					dos.writeUTF(fs.name);
+					dos.writeLong(fs.count);
+					dos.writeInt(fs.nbt.length);
+					dos.write(fs.nbt);
+				}
+			}
+		}
+		dos.flush();
+		baos.writeTo(gzf);
+		baos.reset();
+		synchronized(item_buffers) {
+			dos.writeInt(item_buffers.size());
+			for(Entry<String, ArrayList<ItemStack>> freq_buffer:item_buffers.entrySet()) {
+				dos.writeUTF(freq_buffer.getKey());
+				ArrayList<ItemStack> list = freq_buffer.getValue();
+				dos.writeInt(list.size());
+				for(ItemStack is:list) {
+					dos.writeUTF(is.name);
+					dos.writeLong(is.count);
+					dos.writeInt(is.damage);
+					dos.writeInt(is.nbt.length);
+					dos.write(is.nbt);
+				}
+			}
+		}
+		dos.flush();
+		baos.writeTo(gzf);
 	}
 
 	private static void client(Socket soc) throws IOException {
