@@ -2,10 +2,10 @@ let previousItemData = [];
 const freq = new URLSearchParams(window.location.search).get('freq');
 // ロケールによって表示するテキストを変更する
 window.addEventListener("load", function () {
-    document.getElementById('item-info-title').innerText = localeText[locale].itemDetailInfoTitle;
+    document.getElementById('fluid-info-title').innerText = localeText[locale].fluidDetailInfoTitle;
     document.getElementById('modId-header').innerText = localeText[locale].modIdHeader;
-    document.getElementById('name-header').innerText = localeText[locale].nameHeader;
-    document.getElementById('amount-header').innerText = localeText[locale].amountHeader;
+    document.getElementById('name-header').innerText = localeText[locale].fluidNameHeader;
+    document.getElementById('amount-header').innerText = localeText[locale].fluidAmountHeader;
 
     const f = freq.toLocaleLowerCase();
     const ids = f.split(',').map(id => `<div class="freq ${id}"></div>`).join('');
@@ -23,11 +23,11 @@ function sortBy(sort_by){
 }
 
 async function fetchItem() {
-    const url = new URL('/api/list/items.json', window.location.origin);
+    const url = new URL('/api/list/fluids.json', window.location.origin);
     url.searchParams.set('frequency', freq);
     const response = await fetch(url);
     const data = await response.json();
-    const table = document.getElementById('item-list').getElementsByTagName('tbody')[0];
+    const table = document.getElementById('fluid-list').getElementsByTagName('tbody')[0];
 
     // 行数を調整
     while (table.rows.length < data.length) {

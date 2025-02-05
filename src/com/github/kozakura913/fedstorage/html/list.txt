@@ -8,3 +8,5 @@ index.js
 freq-color.css
 language-hiragana.svg
 items.js
+fluids.html
+fluids.js
