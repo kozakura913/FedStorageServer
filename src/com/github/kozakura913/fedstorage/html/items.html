@@ -1,0 +1,42 @@
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Item list</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="freq-color.css">
+    <script src="locale.js"></script>
+</head>
+
+<body>
+    <div class="language-switcher">
+        <button onclick="switchLanguage()"><img src="language-hiragana.svg"/></button>
+    </div>
+    <div class="home-button">
+        <button onclick="ReturnToHome()"><img src="home.svg"/></button>
+    </div>
+    <div class="container">
+        <h1 id="item-info-title"></h1>
+        <h2 id="channel-title"></h2>
+        <div class="resizable">
+            <div class="item-table">
+                <table id="item-list" class="fixed-header">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;"><a href="javascript:sortBy('modid')" id="modId-header"></a></th>
+                            <th><a href="javascript:sortBy('name')" id="name-header"></a></th>
+                            <th style="width: 150px;"><a href="javascript:sortBy('name')" id="amount-header"></a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="items.js"></script>
+</body>
+
+</html>

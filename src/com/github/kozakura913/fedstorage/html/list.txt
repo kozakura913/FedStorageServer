@@ -1,0 +1,10 @@
+home.svg
+index.css
+list.txt
+index.html
+locale.js
+items.html
+index.js
+freq-color.css
+language-hiragana.svg
+items.js

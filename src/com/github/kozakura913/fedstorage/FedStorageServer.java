@@ -18,7 +18,7 @@ public class FedStorageServer {
 	static HashMap<String,ArrayList<ItemStack>> item_buffers=new HashMap<>();
 	static HashMap<String,HashMap<String,FluidStack>> fluid_buffers=new HashMap<>();
 	private static final long VERSION=3;
-	private static final String VERSION_STRING="3.2";
+	private static final String VERSION_STRING="3.4";
 
 	public static void main(String[] args) throws IOException {
 		try (ServerSocket server = new java.net.ServerSocket(3030)) {
@@ -195,13 +195,17 @@ public class FedStorageServer {
 				item_buffers.put(freq, freq_buffer);
 			}
 		}
+		int reject_start=0;
 		synchronized(freq_buffer) {
-			freq_buffer.addAll(queue);
+			reject_start=Math.min(Math.max(0,10-freq_buffer.size()),queue.size());
+			freq_buffer.addAll(queue.subList(0,reject_start));
 		}
 		ByteArrayOutputStream baos=new ByteArrayOutputStream();
 		DataOutputStream resp_dos=new DataOutputStream(baos);
-		int reject_count=0;
-		resp_dos.writeInt(reject_count);
+		resp_dos.writeInt(queue.size()-reject_start);
+		for(int i=reject_start;i<queue.size();i++) {
+			resp_dos.writeInt(i);
+		}
 		byte[] bb=baos.toByteArray();
 		int send_length=bb.length;
 		dos.writeInt(send_length);
