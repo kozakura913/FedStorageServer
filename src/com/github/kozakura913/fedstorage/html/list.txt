@@ -1,12 +1,12 @@
 home.svg
 index.css
 list.txt
+fluids.html
 index.html
 locale.js
 items.html
 index.js
+fluids.js
 freq-color.css
 language-hiragana.svg
 items.js
-fluids.html
-fluids.js
