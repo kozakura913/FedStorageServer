@@ -23,7 +23,7 @@ public class CLI {
 		while(true) {
 			String command=reader.readLine();
 			if("save".equals(command)) {
-				System.out.println("saveing...");
+				System.out.println("saving...");
 				long start=System.currentTimeMillis();
 				save();
 				System.out.println("saved "+(System.currentTimeMillis()-start)+"ms");
@@ -96,8 +96,8 @@ public class CLI {
 		}
 	}
 	private static void save(GZIPOutputStream gzf) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
+		ByteArrayOutputStream bosArray = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bosArray);
 		dos.writeLong(SAVE_DATA_FORMAT);
 		synchronized(FedStorageServer.fluid_buffers) {
 			dos.writeInt(FedStorageServer.fluid_buffers.size());
@@ -111,8 +111,8 @@ public class CLI {
 			}
 		}
 		dos.flush();
-		baos.writeTo(gzf);
-		baos.reset();
+		bosArray.writeTo(gzf);
+		bosArray.reset();
 		synchronized(FedStorageServer.item_buffers) {
 			dos.writeInt(FedStorageServer.item_buffers.size());
 			for(Entry<String, ArrayList<ItemStack>> freq_buffer:FedStorageServer.item_buffers.entrySet()) {
@@ -125,6 +125,6 @@ public class CLI {
 			}
 		}
 		dos.flush();
-		baos.writeTo(gzf);
+		bosArray.writeTo(gzf);
 	}
 }
