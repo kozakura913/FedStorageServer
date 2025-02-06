@@ -118,14 +118,14 @@ public class HttpServer extends HttpServlet {
 		for (FluidStack fs:copy) {
 			if (!first) {
 				w.append(",\n");
-			}else {
+			} else {
 				first = false;
 			}
 
 			StringBuffer nbt = new StringBuffer();
 			if (fs.nbt == null) {
 				nbt.append("null");
-			}else {
+			} else {
 				nbt.append("\"");
 				for (int j = 0; j < fs.nbt.length; j++){
 					int i = (int)fs.nbt[j] & 0xff;
@@ -149,7 +149,7 @@ public class HttpServer extends HttpServlet {
 		}
 		ArrayList<FreqEntry> copy = new ArrayList<>();
 		synchronized(FedStorageServer.fluid_buffers) {
-			for(Entry<String, HashMap<String, FluidStack>> e:FedStorageServer.fluid_buffers.entrySet()) {
+			for(Entry<String, HashMap<String, FluidStack>> e : FedStorageServer.fluid_buffers.entrySet()) {
 				FreqEntry fe = new FreqEntry();
 				fe.id = e.getKey();
 				fe.size = e.getValue().size();
@@ -158,10 +158,10 @@ public class HttpServer extends HttpServlet {
 		}
 		w.append("[\n");
 		boolean first = true;
-		for(FreqEntry fe:copy) {
+		for(FreqEntry fe : copy) {
 			if (!first) {
 				w.append(",\n");
-			}else {
+			} else {
 				first = false;
 			}
 			w.append("{\"id\":\"").append(fe.id).append("\",\"size\":").append(Integer.toString(fe.size)).append("}");
@@ -186,11 +186,11 @@ public class HttpServer extends HttpServlet {
 		}
 		w.append("[\n");
 		boolean first = true;
-		for(FreqEntry fe:copy) {
+		for(FreqEntry fe : copy) {
 			if (!first) {
 				w.append(",\n");
-			}else {
-				first=false;
+			} else {
+				first = false;
 			}
 			w.append("{\"id\":\"").append(fe.id).append("\",\"size\":").append(Integer.toString(fe.size)).append("}");
 		}
@@ -216,16 +216,16 @@ public class HttpServer extends HttpServlet {
 		}
 		w.append("[\n");
 		boolean first = true;
-		for(ItemStack is:copy) {
+		for(ItemStack is : copy) {
 			if (!first) {
 				w.append(",\n");
-			}else {
+			} else {
 				first = false;
 			}
 			StringBuffer nbt = new StringBuffer();
 			if (is.nbt == null) {
 				nbt.append("null");
-			}else {
+			} else {
 				nbt.append("\"");
 				for (int j = 0; j < is.nbt.length; j++){
 					int i = (int)is.nbt[j] & 0xff;
@@ -255,7 +255,7 @@ public class HttpServer extends HttpServlet {
 		URL res = HttpServer.class.getClassLoader().getResource("com/github/kozakura913/fedstorage/html/list.txt");
 		if (res == null) {
 			System.out.println("FrontendResource notfound");
-		}else {
+		} else {
 			try(InputStream is = res.openStream()){
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
 				while(true) {
