@@ -28,13 +28,6 @@ public class HttpServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final HashSet<String> files = new HashSet<>();
 
-	private static final String endpoints[][] = {
-		{"/api/list/item_frequency.json", "item_frequency"},
-		{"/api/list/items.json", "items"},
-		{"/api/list/fluid_frequency.json", "fluid_frequency"},
-		{"/api/list/fluids.json", "fluids"},
-	};
-
 	private static final String contentTypes[][] = {
 		{".html", "text/html"},
 		{".css",  "text/css"},
@@ -53,12 +46,18 @@ public class HttpServer extends HttpServlet {
 			PrintWriter w = response.getWriter();
 			Method method;
 
-			for (String[] endpoint : endpoints) {
-				if (path.equals(endpoint[0])) {
-					method = this.getClass().getMethod(endpoint[1], new Class[]{Writer.class, HttpServletRequest.class});
-					method.invoke(w, request);
-					break;
-				}
+			if (path.equals("/api/list/item_frequency.json")) {
+				item_frequency(w);
+
+			} else if (path.equals("/api/list/items.json")) {
+				items(w, request);
+
+			} else if (path.equals("/api/list/fluid_frequency.json")) {
+				fluid_frequency(w);
+
+			} else if (path.equals("/api/list/fluids.json")) {
+				fluids(w, request);
+
 			}
 
 			w.flush();
@@ -93,7 +92,6 @@ public class HttpServer extends HttpServlet {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private void fluids(PrintWriter w, HttpServletRequest req) {
 		String freq=req.getParameter("frequency");
 		if (freq == null) {
@@ -141,12 +139,12 @@ public class HttpServer extends HttpServlet {
 		w.append("\n]");
 	}
 
-	@SuppressWarnings("unused")
-	private void fluid_frequency(Writer w, HttpServletRequest req) throws IOException {
+	private void fluid_frequency(Writer w) throws IOException {
 		class FreqEntry{
 			String id;
 			int size;
 		}
+
 		ArrayList<FreqEntry> copy = new ArrayList<>();
 		synchronized(FedStorageServer.fluid_buffers) {
 			for(Entry<String, HashMap<String, FluidStack>> e : FedStorageServer.fluid_buffers.entrySet()) {
@@ -157,6 +155,7 @@ public class HttpServer extends HttpServlet {
 			}
 		}
 		w.append("[\n");
+
 		boolean first = true;
 		for(FreqEntry fe : copy) {
 			if (!first) {
@@ -169,12 +168,12 @@ public class HttpServer extends HttpServlet {
 		w.append("\n]");
 	}
 
-	@SuppressWarnings("unused")
-	private void item_frequency(Writer w, HttpServletRequest req) throws IOException {
+	private void item_frequency(Writer w) throws IOException {
 		class FreqEntry{
 			String id;
 			int size;
 		}
+
 		ArrayList<FreqEntry> copy = new ArrayList<>();
 		synchronized(FedStorageServer.item_buffers) {
 			for(Entry<String, ArrayList<ItemStack>> e:FedStorageServer.item_buffers.entrySet()) {
@@ -185,6 +184,7 @@ public class HttpServer extends HttpServlet {
 			}
 		}
 		w.append("[\n");
+
 		boolean first = true;
 		for(FreqEntry fe : copy) {
 			if (!first) {
@@ -197,7 +197,6 @@ public class HttpServer extends HttpServlet {
 		w.append("\n]");
 	}
 
-	@SuppressWarnings("unused")
 	private void items(Writer w,HttpServletRequest req) throws IOException {
 		String freq = req.getParameter("frequency");
 		if (freq == null) {
@@ -205,16 +204,19 @@ public class HttpServer extends HttpServlet {
 			return;
 		}
 		freq = freq.toUpperCase();
+
 		ArrayList<ItemStack> freq_buffer = FedStorageServer.item_buffers.get(freq);
 		if (freq_buffer == null) {
 			w.append("[]");
 			return;
 		}
+
 		ArrayList<ItemStack> copy;
 		synchronized(freq_buffer) {
 			copy = new ArrayList<ItemStack>(freq_buffer);
 		}
 		w.append("[\n");
+
 		boolean first = true;
 		for(ItemStack is : copy) {
 			if (!first) {
@@ -252,6 +254,7 @@ public class HttpServer extends HttpServlet {
 				e1.printStackTrace();
 			}
 		}
+
 		URL res = HttpServer.class.getClassLoader().getResource("com/github/kozakura913/fedstorage/html/list.txt");
 		if (res == null) {
 			System.out.println("FrontendResource notfound");
@@ -267,14 +270,18 @@ public class HttpServer extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
+
 		Server server = new Server(3031);
 		ServletContextHandler context = new ServletContextHandler("/",ServletContextHandler.SESSIONS);
+
 		context.setWelcomeFiles(new String[] { "index.html" });
 		context.addServlet( new ServletHolder( new HttpServer()), "/*");
 		server.setHandler(context);
+
 		try {
 			server.start();
 			System.out.println("ServerStart");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
