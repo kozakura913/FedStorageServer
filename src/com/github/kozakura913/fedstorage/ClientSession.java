@@ -117,10 +117,10 @@ public class ClientSession extends Thread {
 			soc_dos.flush();
 			return;
 		}
-		ByteArrayOutputStream baos=new ByteArrayOutputStream();
-		DataOutputStream resp_dos=new DataOutputStream(baos);
+		ByteArrayOutputStream bosArray=new ByteArrayOutputStream();
+		DataOutputStream resp_dos=new DataOutputStream(bosArray);
 		ret_fs.write(resp_dos);
-		byte[] bb=baos.toByteArray();
+		byte[] bb=bosArray.toByteArray();
 		int send_length=bb.length;
 		soc_dos.writeInt(send_length);
 		soc_dos.write(bb);
@@ -171,13 +171,13 @@ public class ClientSession extends Thread {
 			reject_start=Math.min(Math.max(0,10-freq_buffer.size()),queue.size());
 			freq_buffer.addAll(queue.subList(0,reject_start));
 		}
-		ByteArrayOutputStream baos=new ByteArrayOutputStream();
-		DataOutputStream resp_dos=new DataOutputStream(baos);
+		ByteArrayOutputStream bosArray=new ByteArrayOutputStream();
+		DataOutputStream resp_dos=new DataOutputStream(bosArray);
 		resp_dos.writeInt(queue.size()-reject_start);
 		for(int i=reject_start;i<queue.size();i++) {
 			resp_dos.writeInt(i);
 		}
-		byte[] bb=baos.toByteArray();
+		byte[] bb=bosArray.toByteArray();
 		int send_length=bb.length;
 		soc_dos.writeInt(send_length);
 		soc_dos.write(bb);
@@ -204,14 +204,14 @@ public class ClientSession extends Thread {
 				queue.add(freq_buffer.remove(0));
 			}
 		}
-		ByteArrayOutputStream baos=new ByteArrayOutputStream();
-		DataOutputStream resp_dos=new DataOutputStream(baos);
+		ByteArrayOutputStream bosArray=new ByteArrayOutputStream();
+		DataOutputStream resp_dos=new DataOutputStream(bosArray);
 		resp_dos.writeInt(queue.size());
 		for(ItemStack is : queue) {
 			is.write(resp_dos);
 		}
 		resp_dos.flush();
-		byte[] bb=baos.toByteArray();
+		byte[] bb=bosArray.toByteArray();
 		soc_dos.writeInt(bb.length);
 		soc_dos.write(bb);
 		soc_dos.flush();
