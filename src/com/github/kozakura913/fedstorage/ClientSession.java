@@ -10,39 +10,65 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class ClientSession {
+public class ClientSession extends Thread {
+
+	private static final byte DATA_FREQUENCY = 1;
+	private static final byte DATA_ITEM_RECEIVE = 2;
+	private static final byte DATA_ITEM_SEND = 3;
+	private static final byte DATA_FLUID_RECEIVE = 4;
+	private static final byte DATA_FLUID_SEND = 5;
 
 	private String freq="";
 	private DataInputStream soc_dis;
 	private DataOutputStream soc_dos;
+
+	private volatile boolean shutdown = false;
+
 	public ClientSession(Socket soc) throws IOException {
 		soc_dis = new DataInputStream(soc.getInputStream());
 		soc_dos = new DataOutputStream(new BufferedOutputStream(soc.getOutputStream()));
 		soc_dos.writeLong(FedStorageServer.VERSION);
 		soc_dos.flush();
-		while(true) {
-			int command=soc_dis.readByte();
-			switch(command){
-				case -1://NOP
-					break;
-				case 1:
-					freq=soc_dis.readUTF();
-					break;
-				case 2:
-					itemRecv();
-					break;
-				case 3:
-					itemSend();
-					break;
-				case 4:
-					fluidRecv();
-					break;
-				case 5:
-					fluidSend();
-					break;
-			}
-		}
 	}
+
+	public void Shutdown() {
+		shutdown = true;
+	}
+
+	public void run() {
+		System.out.println("client connect");
+		try {
+			while(!shutdown) {
+				int command = soc_dis.readByte();
+				switch(command){
+					case DATA_FREQUENCY:
+						freq=soc_dis.readUTF();
+						break;
+					case DATA_ITEM_RECEIVE:
+						itemRecv();
+						break;
+					case DATA_ITEM_SEND:
+						itemSend();
+						break;
+					case DATA_FLUID_RECEIVE:
+						fluidRecv();
+						break;
+					case DATA_FLUID_SEND:
+						fluidSend();
+						break;
+					default: //NOP
+						break;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("client exit");
+			return;
+		}
+		System.out.println("client exit");
+		return;
+	}
+
 	private void fluidSend() throws IOException {
 		String request_fluid_name=soc_dis.readUTF();
 		long available=soc_dis.readLong();

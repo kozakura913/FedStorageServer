@@ -15,6 +15,7 @@ public class FedStorageServer {
 	public static final long VERSION=4;
 	public static final String VERSION_STRING="4.0";
 
+	private static ArrayList<ClientSession> list_session = new ArrayList<ClientSession>();
 	public static void main(String[] args) throws IOException {
 		new Thread(FedStorageServer::server,"Server").start();
 		CLI.main(args);
@@ -26,18 +27,17 @@ public class FedStorageServer {
 			while(true) {
 				Socket soc = server.accept();
 				soc.setSoTimeout(10000);//10s
-				new Thread(()->{
-					try {
-						System.out.println("client connect");
-						new ClientSession(soc);
-						System.out.println("client exit");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}).start();
+
+				ClientSession cs = new ClientSession(soc);
+		        cs.start();
+
+				list_session.add(cs);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			for (ClientSession clientSession : list_session) {
+				clientSession.Shutdown();
+			}
 		}
 	}
 	public static final String hash(byte[] bb) {
