@@ -22,9 +22,11 @@ public class ClientSession extends Thread {
 	private DataInputStream soc_dis;
 	private DataOutputStream soc_dos;
 
+	private Socket clientSocket;
 	private volatile boolean shutdown = false;
 
 	public ClientSession(Socket soc) throws IOException {
+		clientSocket = soc;
 		soc_dis = new DataInputStream(soc.getInputStream());
 		soc_dos = new DataOutputStream(new BufferedOutputStream(soc.getOutputStream()));
 		soc_dos.writeLong(FedStorageServer.VERSION);
@@ -35,35 +37,48 @@ public class ClientSession extends Thread {
 		shutdown = true;
 	}
 
+	public Socket getSocket() {
+		return this.clientSocket;
+	}
+
 	public void run() {
 		System.out.println("client connect");
 		try {
 			while(!shutdown) {
-				int command = soc_dis.readByte();
-				switch(command){
-					case DATA_FREQUENCY:
-						freq = soc_dis.readUTF();
-						break;
-					case DATA_ITEM_RECEIVE:
-						itemRecv();
-						break;
-					case DATA_ITEM_SEND:
-						itemSend();
-						break;
-					case DATA_FLUID_RECEIVE:
-						fluidRecv();
-						break;
-					case DATA_FLUID_SEND:
-						fluidSend();
-						break;
-					default: //NOP
-						break;
+				if (clientSocket.isConnected()) {
+					int command = soc_dis.readByte();
+					switch(command){
+						case DATA_FREQUENCY:
+							freq = soc_dis.readUTF();
+							break;
+						case DATA_ITEM_RECEIVE:
+							itemRecv();
+							break;
+						case DATA_ITEM_SEND:
+							itemSend();
+							break;
+						case DATA_FLUID_RECEIVE:
+							fluidRecv();
+							break;
+						case DATA_FLUID_SEND:
+							fluidSend();
+							break;
+						default: //NOP
+							break;
+					}
+				} else {
+					break;
 				}
 			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("client exit");
-			return;
+		} finally {
+			try {
+				clientSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		System.out.println("client exit");
 		return;
@@ -139,7 +154,7 @@ public class ClientSession extends Thread {
 		FluidStack fs = new FluidStack();
 
 		fs.read(soc_dis);
-		System.out.println("fluidRecv,"+fs.name+"@"+fs.count+"mb");
+		System.out.println("fluidRecv," + fs.name + "@" + fs.count + "mb");
 
 		HashMap<String, FluidStack> freq_buffer;
 		synchronized (FedStorageServer.fluid_buffers) {

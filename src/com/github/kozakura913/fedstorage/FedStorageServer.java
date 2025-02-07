@@ -36,6 +36,13 @@ public class FedStorageServer {
 		        cs.start();
 
 				list_session.add(cs);
+
+				for (ClientSession clientSession : list_session) {
+					if (!clientSession.getSocket().isConnected()) {
+						clientSession.Shutdown();
+						list_session.remove(clientSession);
+					}
+				}
 			}
 
 		} catch (Exception e) {
