@@ -49,6 +49,8 @@ public class ClientSession {
 				case DATA_FLUID_SEND:
 					fluidSend();
 					break;
+				default:
+					break;
 			}
 		}
 	}
