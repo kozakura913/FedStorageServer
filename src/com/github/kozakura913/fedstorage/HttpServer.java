@@ -22,6 +22,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import net.arnx.jsonic.JSON;
+
 public class HttpServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final HashSet<String> files = new HashSet<>();
@@ -104,17 +107,10 @@ public class HttpServer extends HttpServlet {
 			copy.addAll(freq_buffer.values());
 		}
 
-		w.append("[\n");
-
-		boolean first = true;
+		ArrayList<Fluids> result = new ArrayList<>();
 		for(FluidStack fs : copy) {
-			if (!first) {
-				w.append(",\n");
-			} else {
-				first = false;
-			}
-
 			StringBuffer nbt = new StringBuffer();
+			Fluids fluids_rec = new Fluids();
 
 			if (fs.nbt == null) {
 				nbt.append("null");
@@ -130,24 +126,24 @@ public class HttpServer extends HttpServlet {
 				}
 				nbt.append("\"");
 			}
-			w.append("{\"name\":\"").append(fs.name).append("\",\"count\":").append(Long.toString(fs.count)).append(",\"nbt\":").append(nbt).append("}");
+
+			fluids_rec.setNbt(nbt.toString());
+			fluids_rec.setCount(fs.count);
+			fluids_rec.setName(fs.name);
+			result.add(fluids_rec);			
 		}
-		w.append("\n]");
+		w.append(JSON.encode(result));
 	}
 
 	private void fluid_frequency(Writer w) throws IOException {
-		class FreqEntry{
-			String id;
-			int size;
-		}
+		ArrayList<FluidFrequency> result = new ArrayList<>();
 
-		ArrayList<FreqEntry> copy = new ArrayList<>();
 		synchronized(FedStorageServer.fluid_buffers) {
 			for(Entry<String, HashMap<String, FluidStack>> e : FedStorageServer.fluid_buffers.entrySet()) {
-				FreqEntry fe = new FreqEntry();
-				fe.id = e.getKey();
-				fe.size = e.getValue().size();
-				copy.add(fe);
+				FluidFrequency fe = new FluidFrequency();
+				fe.setId(e.getKey());
+				fe.setSize(e.getValue().size());
+				result.add(fe);
 			}
 		}
 		w.append("[\n");
@@ -165,32 +161,16 @@ public class HttpServer extends HttpServlet {
 	}
 
 	private void item_frequency(Writer w) throws IOException {
-		class FreqEntry{
-			String id;
-			int size;
-		}
-
-		ArrayList<FreqEntry> copy = new ArrayList<>();
+		ArrayList<ItemFrequency> result = new ArrayList<>();
 		synchronized(FedStorageServer.item_buffers) {
 			for(Entry<String, ArrayList<ItemStack>> e : FedStorageServer.item_buffers.entrySet()) {
-				FreqEntry fe = new FreqEntry();
-				fe.id = e.getKey();
-				fe.size = e.getValue().size();
-				copy.add(fe);
+				ItemFrequency fe = new ItemFrequency();
+				fe.setId(e.getKey());
+				fe.setSize(e.getValue().size());
+				result.add(fe);
 			}
 		}
-		w.append("[\n");
-
-		boolean first = true;
-		for(FreqEntry fe : copy) {
-			if (!first) {
-				w.append(",\n");
-			} else {
-				first = false;
-			}
-			w.append("{\"id\":\"").append(fe.id).append("\",\"size\":").append(Integer.toString(fe.size)).append("}");
-		}
-		w.append("\n]");
+		w.append(JSON.encode(result));
 	}
 
 	private void items(Writer w,HttpServletRequest req) throws IOException {
@@ -212,17 +192,12 @@ public class HttpServer extends HttpServlet {
 		synchronized(freq_buffer) {
 			copy=(ArrayList<ItemStack>) freq_buffer.clone();
 		}
-		w.append("[\n");
 
-		boolean first = true;
+		ArrayList<Items> result = new ArrayList<>();
 		for(ItemStack is : copy) {
-			if (!first) {
-				w.append(",\n");
-			} else {
-				first = false;
-			}
-
+			Items items_rec = new Items();
 			StringBuffer nbt = new StringBuffer();
+
 			if (is.nbt == null) {
 				nbt.append("null");
 			} else {
@@ -236,9 +211,14 @@ public class HttpServer extends HttpServlet {
 				}
 				nbt.append("\"");
 			}
-			w.append("{\"name\":\"").append(is.name).append("\",\"count\":").append(Integer.toString(is.count)).append(",\"nbt\":").append(nbt).append("}");
+
+			items_rec.setNbt(nbt.toString());
+			items_rec.setCount(is.count);
+			items_rec.setName(is.name);
+
+			result.add(items_rec);
 		}
-		w.append("\n]");
+		w.append(JSON.encode(result));
 	}
 
 	public static void start() {
