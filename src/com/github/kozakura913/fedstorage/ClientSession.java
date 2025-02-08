@@ -16,6 +16,7 @@ public class ClientSession {
 	private DataInputStream soc_dis;
 	private DataOutputStream soc_dos;
 
+	private static final int DATA_NOP = -1;
 	private static final int DATA_FREQUENCY = 1;
 	private static final int DATA_ITEM_RECEIVE = 2;
 	private static final int DATA_ITEM_SEND = 3;
@@ -31,6 +32,8 @@ public class ClientSession {
 		while(true) {
 			int command = soc_dis.readByte();
 			switch(command){
+				case DATA_NOP: // NOP
+					break;
 				case DATA_FREQUENCY:
 					freq = soc_dis.readUTF();
 					break;
@@ -45,8 +48,6 @@ public class ClientSession {
 					break;
 				case DATA_FLUID_SEND:
 					fluidSend();
-					break;
-				default:	// NOP
 					break;
 			}
 		}
