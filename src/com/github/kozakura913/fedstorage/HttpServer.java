@@ -41,6 +41,8 @@ public class HttpServer extends HttpServlet {
 				fluid_frequency(w);
 			} else if (path.equals("/api/list/fluids.json")) {
 				fluids(w,request);
+			} else if (path.equals("/api/list/energy_frequency.json")) {
+				energy_frequency(w);
 			}
 			w.flush();
 			return;
@@ -131,6 +133,35 @@ public class HttpServer extends HttpServlet {
 				nbt.append("\"");
 			}
 			w.append("{\"name\":\"").append(fs.name).append("\",\"count\":").append(Long.toString(fs.count)).append(",\"nbt\":").append(nbt).append("}");
+		}
+		w.append("\n]");
+	}
+
+	private void energy_frequency(Writer w) throws IOException {
+		class FreqEntry{
+			String id;
+			long value;
+		}
+
+		ArrayList<FreqEntry> copy = new ArrayList<>();
+		synchronized(FedStorageServer.energy_buffers) {
+			for(Entry<String, EnergyStack> e : FedStorageServer.energy_buffers.entrySet()) {
+				FreqEntry fe = new FreqEntry();
+				fe.id = e.getKey();
+				fe.value = e.getValue().value;
+				copy.add(fe);
+			}
+		}
+		w.append("[\n");
+
+		boolean first = true;
+		for(FreqEntry fe : copy) {
+			if (!first) {
+				w.append(",\n");
+			} else {
+				first = false;
+			}
+			w.append("{\"id\":\"").append(fe.id).append("\",\"value\":").append(Long.toString(fe.value)).append("}");
 		}
 		w.append("\n]");
 	}

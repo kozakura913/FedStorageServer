@@ -10,11 +10,12 @@ import java.security.NoSuchAlgorithmException;
 
 public class FedStorageServer {
 
+	static HashMap<String,EnergyStack> energy_buffers = new HashMap<>();
 	static HashMap<String,ArrayList<ItemStack>> item_buffers = new HashMap<>();
 	static HashMap<String,HashMap<String,FluidStack>> fluid_buffers = new HashMap<>();
 
-	public static final long VERSION = 4;
-	public static final String VERSION_STRING = "4.0";
+	public static final long VERSION = 5;
+	public static final String VERSION_STRING = "5.0";
 
 	public static void main(String[] args) throws IOException {
 		new Thread(FedStorageServer::server,"Server").start();

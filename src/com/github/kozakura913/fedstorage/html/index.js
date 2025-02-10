@@ -1,4 +1,5 @@
-let previousItemData = {item: [], fluid: []};  
+let previousItemData = {item: [], fluid: [], energy: []};
+let previousEnergyTimestamp=null;
 // ロケールによって表示するテキストを変更する
 window.addEventListener("load", function () {
     document.getElementById('item-info-title').innerText = localeText[locale].itemInfoTitle;
@@ -7,6 +8,9 @@ window.addEventListener("load", function () {
     document.getElementById('fluid-info-title').innerText = localeText[locale].fluidInfoTitle;
     document.getElementById('fluid-channel-header').innerText = localeText[locale].fluidChannelHeader;
     document.getElementById('fluid-type-header').innerText = localeText[locale].fluidTypeHeader;
+    document.getElementById('energy-info-title').innerText = localeText[locale].energyInfoTitle;
+    document.getElementById('energy-channel-header').innerText = localeText[locale].energyChannelHeader;
+    document.getElementById('energy-type-header').innerText = localeText[locale].energyAmountHeader;
 });
 async function fetchItem() {
     const response = await fetch('/api/list/item_frequency.json');
@@ -79,9 +83,44 @@ async function fetchFluid() {
     // 現在のデータを保存
     previousItemData.fluid = data;
 }
+async function fetchEnergy() {
+    const response = await fetch('/api/list/energy_frequency.json');
+    const data = await response.json();
+    const table = document.getElementById('energy-list').getElementsByTagName('tbody')[0];
+
+    // 行数を調整
+    while (table.rows.length < data.length) {
+        table.insertRow();
+    }
+    while (table.rows.length > data.length) {
+        table.deleteRow(-1);
+    }
+    // 行を上から書き換え
+    data.forEach((item, index) => {
+        const row = table.rows[index];
+        let cell1 = row.cells[0];
+        let cell2 = row.cells[1];
+        if (!cell1) cell1 = row.insertCell(0);
+        if (!cell2) cell2 = row.insertCell(1);
+
+        const ids = item.id.split(',').map(id => `<div class="freq ${id}"></div>`).join('');
+        const localeText = item.id.split(',').map(id => localeColour[locale][id] || id).join(', ');
+        cell1.innerHTML = `<span>`+ids + '</span> ' + `<span class="txt freq-guide">${localeText}</span>`;
+
+        const previousItem = previousItemData.energy[index] || {};
+        const difference = Math.trunc((item.value - (previousItem.value || 0))*((performance.now()-previousEnergyTimestamp)/1000)/20);
+        const differenceText = difference > 0 ? `+${difference.toLocaleString()}` : difference;
+        cell2.innerHTML = `${item.value.toLocaleString()} <span style="width:100px" class="diff-value ${difference > 0 ? 'add' : difference < 0 ? 'sub' : 'zero'}">${difference==0?"±":""}${differenceText.toLocaleString()}RF/t</span>`;
+        cell2.classList.add('right-align');
+    });
+    previousEnergyTimestamp=performance.now();
+    // 現在のデータを保存
+    previousItemData.energy = data;
+}
 async function fetchData() {
     await fetchItem();
     await fetchFluid();
+    await fetchEnergy();
 }
 window.onload = async function () {
     await fetchData();

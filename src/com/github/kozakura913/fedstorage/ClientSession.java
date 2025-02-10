@@ -22,6 +22,8 @@ public class ClientSession {
 	private static final int DATA_ITEM_SEND = 3;
 	private static final int DATA_FLUID_RECEIVE = 4;
 	private static final int DATA_FLUID_SEND = 5;
+	private static final int DATA_ENERGY_RECEIVE = 6;
+	private static final int DATA_ENERGY_SEND = 7;
 
 	public ClientSession(Socket soc) throws IOException {
 		soc_dis = new DataInputStream(soc.getInputStream());
@@ -49,10 +51,62 @@ public class ClientSession {
 				case DATA_FLUID_SEND:
 					fluidSend();
 					break;
+				case DATA_ENERGY_RECEIVE:
+					energyRecv();
+					break;
+				case DATA_ENERGY_SEND:
+					energySend();
+					break;
 				default:
 					break;
 			}
 		}
+	}
+
+	private void energySend() throws IOException {
+		long max_recv=soc_dis.readLong();
+
+		EnergyStack freq_buffer;
+
+		synchronized(FedStorageServer.energy_buffers) {
+			freq_buffer = FedStorageServer.energy_buffers.get(freq);
+
+			if (freq_buffer == null) {
+				freq_buffer = new EnergyStack();
+				FedStorageServer.energy_buffers.put(freq, freq_buffer);
+			}
+		}
+		long energy=0;
+		synchronized(freq_buffer) {
+			energy = Math.min(freq_buffer.value, max_recv);
+			freq_buffer.value -= energy;
+		}
+		soc_dos.writeLong(energy);
+		soc_dos.flush();
+	}
+
+	private void energyRecv() throws IOException {
+		long energy=soc_dis.readLong();
+
+		EnergyStack freq_buffer;
+
+		synchronized(FedStorageServer.energy_buffers) {
+			freq_buffer = FedStorageServer.energy_buffers.get(freq);
+
+			if (freq_buffer == null) {
+				freq_buffer = new EnergyStack();
+				FedStorageServer.energy_buffers.put(freq, freq_buffer);
+			}
+		}
+		long reject=energy;
+		synchronized(freq_buffer) {
+			long cap = Integer.MAX_VALUE - freq_buffer.value;
+			long add = Math.min(cap, energy);
+			freq_buffer.value += add;
+			reject = energy - add;
+		}
+		soc_dos.writeLong(reject);
+		soc_dos.flush();
 	}
 
 	private void fluidSend() throws IOException {

@@ -17,7 +17,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class CLI {
-	private static long SAVE_DATA_FORMAT = 1;
+	private static long SAVE_DATA_FORMAT = 2;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -116,6 +116,19 @@ public class CLI {
 				FedStorageServer.item_buffers.put(id,freq_buffer);
 			}
 		}
+
+		synchronized(FedStorageServer.energy_buffers) {
+			FedStorageServer.energy_buffers.clear();
+			int freq_count = dis.readInt();
+
+			for(int freq = 0; freq < freq_count; freq++) {
+				String id = dis.readUTF();
+				EnergyStack freq_buffer = new EnergyStack();
+				freq_buffer.value = dis.readLong();
+
+				FedStorageServer.energy_buffers.put(id,freq_buffer);
+			}
+		}
 	}
 	private static void save(GZIPOutputStream gzf) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -161,5 +174,20 @@ public class CLI {
 
 		dos.flush();
 		baos.writeTo(gzf);
+		baos.reset();
+
+		synchronized(FedStorageServer.energy_buffers) {
+			dos.writeInt(FedStorageServer.energy_buffers.size());
+
+			for(Entry<String, EnergyStack> freq_buffer : FedStorageServer.energy_buffers.entrySet()) {
+				dos.writeUTF(freq_buffer.getKey());
+				dos.writeLong(freq_buffer.getValue().value);
+
+			}
+		}
+
+		dos.flush();
+		baos.writeTo(gzf);
+		baos.reset();
 	}
 }
