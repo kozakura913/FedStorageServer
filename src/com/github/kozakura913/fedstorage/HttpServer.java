@@ -88,7 +88,6 @@ public class HttpServer extends HttpServlet {
 
 	private void clients(PrintWriter w) {
 		w.append("[");
-		StringBuilder sb = new StringBuilder();
 		synchronized(FedStorageServer.clients) {
 			boolean first = true;
 			for(ClientSession cs:FedStorageServer.clients) {
@@ -98,12 +97,12 @@ public class HttpServer extends HttpServlet {
 				} else {
 					first = false;
 				}
+				StringBuilder sb = new StringBuilder();
 				sb.append("{\"name\":\"");
 				sb.append(host_name);
 				sb.append("\",\"sync\":");
 				sb.append(cs.last_sync_time);
 				sb.append("}");
-				
 				w.append(sb);
 			}
 		}

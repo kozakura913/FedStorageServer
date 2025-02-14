@@ -203,7 +203,7 @@ public class ClientSession {
 		FluidStack fs = new FluidStack();
 		fs.read(soc_dis);
 	
-		System.out.println("fluidRecv," + fs.name + "@" + fs.count + "mb");
+		//System.out.println("fluidRecv," + fs.name + "@" + fs.count + "mb");
 		HashMap<String, FluidStack> freq_buffer;
 	
 		synchronized(FedStorageServer.fluid_buffers) {

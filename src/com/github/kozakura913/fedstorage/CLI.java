@@ -34,7 +34,13 @@ public class CLI {
 			} else if ("load".equals(command)) {
 				System.out.println("loading...");
 				long start = System.currentTimeMillis();
-				load();
+				load(false);
+				System.out.println("loaded " + (System.currentTimeMillis() - start) + "ms");
+
+			} else if ("load_clear".equals(command)) {
+				System.out.println("loading...");
+				long start = System.currentTimeMillis();
+				load(true);
 				System.out.println("loaded " + (System.currentTimeMillis() - start) + "ms");
 
 			} else if ("stop".equals(command)) {
@@ -58,9 +64,9 @@ public class CLI {
 		}
 	}
 
-	private static void load() {
+	private static void load(boolean clear) {
 		try(GZIPInputStream gzf = new GZIPInputStream(new BufferedInputStream(new FileInputStream("save.dat.gz")))){
-			load(gzf);
+			load(gzf, clear);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -68,7 +74,7 @@ public class CLI {
 		}
 	}
 
-	private static void load(GZIPInputStream gzf) throws IOException {
+	private static void load(GZIPInputStream gzf, boolean clear) throws IOException {
 		DataInputStream dis = new DataInputStream(gzf);
 		if (dis.readLong() != SAVE_DATA_FORMAT) {
 			System.err.println("Bad Data Format Version");
@@ -77,7 +83,9 @@ public class CLI {
 		}
 
 		synchronized(FedStorageServer.fluid_buffers) {
-			FedStorageServer.fluid_buffers.clear();
+			if(clear) {
+				FedStorageServer.fluid_buffers.clear();
+			}
 			int fluid_freq_count = dis.readInt();
 
 			for(int freq = 0; freq < fluid_freq_count; freq++) {
@@ -98,7 +106,9 @@ public class CLI {
 		}
 
 		synchronized(FedStorageServer.item_buffers) {
-			FedStorageServer.item_buffers.clear();
+			if(clear) {
+				FedStorageServer.item_buffers.clear();
+			}
 			int fluid_freq_count = dis.readInt();
 
 			for(int freq = 0; freq < fluid_freq_count; freq++) {
@@ -118,7 +128,9 @@ public class CLI {
 		}
 
 		synchronized(FedStorageServer.energy_buffers) {
-			FedStorageServer.energy_buffers.clear();
+			if(clear) {
+				FedStorageServer.energy_buffers.clear();
+			}
 			int freq_count = dis.readInt();
 
 			for(int freq = 0; freq < freq_count; freq++) {

@@ -16,7 +16,7 @@ public class FedStorageServer {
 	static ArrayList<ClientSession> clients = new ArrayList<>();
 
 	public static final long VERSION = 6;
-	public static final String VERSION_STRING = "6.0";
+	public static final String VERSION_STRING = "6.1";
 
 	public static void main(String[] args) throws IOException {
 		new Thread(FedStorageServer::server,"Server").start();
