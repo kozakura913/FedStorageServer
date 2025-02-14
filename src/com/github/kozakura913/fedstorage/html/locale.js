@@ -57,7 +57,8 @@ const localeText = {
         amountHeader: "量",
         fluidNameHeader: "液体ID",
         fluidAmountHeader: "量",
-        fluidTypeHeader: "種類"
+        fluidTypeHeader: "種類",
+        clientHostName: "サーバー名",
     },
     en: {
         itemInfoTitle: "Item Information",
@@ -76,7 +77,8 @@ const localeText = {
         amountHeader: "Amount",
         fluidNameHeader: "Fluid ID",
         fluidAmountHeader: "Amount",
-        fluidTypeHeader: "Types"
+        fluidTypeHeader: "Types",
+        clientHostName: "ServerName",
     }
 };
 

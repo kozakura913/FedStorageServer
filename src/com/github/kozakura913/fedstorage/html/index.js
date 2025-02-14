@@ -11,6 +11,7 @@ window.addEventListener("load", function () {
     document.getElementById('energy-info-title').innerText = localeText[locale].energyInfoTitle;
     document.getElementById('energy-channel-header').innerText = localeText[locale].energyChannelHeader;
     document.getElementById('energy-type-header').innerText = localeText[locale].energyAmountHeader;
+    document.getElementById('host-info-title').innerText = localeText[locale].clientHostName;
 });
 async function fetchItem() {
     const response = await fetch('/api/list/item_frequency.json');
@@ -117,10 +118,24 @@ async function fetchEnergy() {
     // 現在のデータを保存
     previousItemData.energy = data;
 }
+async function fetchClients() {
+    const response = await fetch('/api/list/clients.json');
+    const data = await response.json();
+    const list = document.getElementById('host-list');
+    list.innerHTML="";
+    data.forEach((item, index) => {
+        let li=element=document.createElement("li");
+        let span=element=document.createElement("span");
+        span.innerText=item.name;
+        li.appendChild(span);
+        span=element=document.createElement("span");
+        span.innerText=" "+item.sync+"ms";
+        li.appendChild(span);
+        list.appendChild(li);
+    });
+}
 async function fetchData() {
-    await fetchItem();
-    await fetchFluid();
-    await fetchEnergy();
+    await Promise.all([fetchItem(),fetchFluid(),fetchEnergy(),fetchClients()]);
 }
 window.onload = async function () {
     await fetchData();

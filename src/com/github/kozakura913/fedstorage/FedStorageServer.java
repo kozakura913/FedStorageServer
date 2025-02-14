@@ -13,9 +13,10 @@ public class FedStorageServer {
 	static HashMap<String,EnergyStack> energy_buffers = new HashMap<>();
 	static HashMap<String,ArrayList<ItemStack>> item_buffers = new HashMap<>();
 	static HashMap<String,HashMap<String,FluidStack>> fluid_buffers = new HashMap<>();
+	static ArrayList<ClientSession> clients = new ArrayList<>();
 
-	public static final long VERSION = 5;
-	public static final String VERSION_STRING = "5.0";
+	public static final long VERSION = 6;
+	public static final String VERSION_STRING = "6.0";
 
 	public static void main(String[] args) throws IOException {
 		new Thread(FedStorageServer::server,"Server").start();
@@ -31,12 +32,21 @@ public class FedStorageServer {
 				Socket soc = server.accept();
 				soc.setSoTimeout(10000);//10s
 				new Thread(()->{
+					ClientSession client = null;
 					try {
 						System.out.println("client connect");
-						new ClientSession(soc);
+						client=new ClientSession(soc);
+						synchronized(clients) {
+							clients.add(client);
+						}
+						client.mainLoop();
 						System.out.println("client exit");
 					} catch (IOException e) {
 						e.printStackTrace();
+					}finally {
+						synchronized(clients) {
+							clients.remove(client);
+						}
 					}
 				}).start();
 			}

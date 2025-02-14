@@ -43,6 +43,8 @@ public class HttpServer extends HttpServlet {
 				fluids(w,request);
 			} else if (path.equals("/api/list/energy_frequency.json")) {
 				energy_frequency(w);
+			} else if (path.equals("/api/list/clients.json")) {
+				clients(w);
 			}
 			w.flush();
 			return;
@@ -84,6 +86,29 @@ public class HttpServer extends HttpServlet {
 		}
 	}
 
+	private void clients(PrintWriter w) {
+		w.append("[");
+		StringBuilder sb = new StringBuilder();
+		synchronized(FedStorageServer.clients) {
+			boolean first = true;
+			for(ClientSession cs:FedStorageServer.clients) {
+				String host_name=cs.getHostName();
+				if (!first) {
+					w.append(",\n");
+				} else {
+					first = false;
+				}
+				sb.append("{\"name\":\"");
+				sb.append(host_name);
+				sb.append("\",\"sync\":");
+				sb.append(cs.last_sync_time);
+				sb.append("}");
+				
+				w.append(sb);
+			}
+		}
+		w.append("]");
+	}
 	private void fluids(PrintWriter w, HttpServletRequest req) {
 		String freq = req.getParameter("frequency");
 

@@ -1,6 +1,7 @@
 package com.github.kozakura913.fedstorage;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,12 +10,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class ClientSession {
 
 	private String freq = "";
+	private String host_name = "DefaultName";
 	private DataInputStream soc_dis;
 	private DataOutputStream soc_dos;
+	public long last_sync_time;
 
 	private static final int DATA_NOP = -1;
 	private static final int DATA_FREQUENCY = 1;
@@ -24,13 +29,18 @@ public class ClientSession {
 	private static final int DATA_FLUID_SEND = 5;
 	private static final int DATA_ENERGY_RECEIVE = 6;
 	private static final int DATA_ENERGY_SEND = 7;
+	private static final int DATA_HOST_NAME = 8;
+	private static final int DATA_PACK_START = 9;
+	private static final int DATA_PACK_END = 10;
 
 	public ClientSession(Socket soc) throws IOException {
 		soc_dis = new DataInputStream(soc.getInputStream());
 		soc_dos = new DataOutputStream(new BufferedOutputStream(soc.getOutputStream()));
 		soc_dos.writeLong(FedStorageServer.VERSION);
 		soc_dos.flush();
-
+	}
+	public void mainLoop() throws IOException {
+		long sync_start=0;
 		while(true) {
 			int command = soc_dis.readByte();
 			switch(command){
@@ -56,6 +66,15 @@ public class ClientSession {
 					break;
 				case DATA_ENERGY_SEND:
 					energySend();
+					break;
+				case DATA_HOST_NAME:
+					host_name = soc_dis.readUTF();
+					break;
+				case DATA_PACK_START:
+					sync_start=System.currentTimeMillis();
+					break;
+				case DATA_PACK_END:
+					last_sync_time=System.currentTimeMillis()-sync_start;
 					break;
 				default:
 					break;
@@ -209,13 +228,20 @@ public class ClientSession {
 	}
 
 	public void itemRecv() throws IOException {
-		int item_count = soc_dis.readInt();
 		ArrayList<ItemStack> queue = new ArrayList<>();
-	
-		for(int i = 0; i < item_count; i++) {
-			ItemStack is = new ItemStack();
-			is.read(soc_dis);
-			queue.add(is);
+		{
+			int bytes_count=soc_dis.readInt();
+			byte[] bb=new byte[bytes_count];
+			soc_dis.readFully(bb);
+			ByteArrayInputStream bis = new ByteArrayInputStream(bb);
+			DataInputStream zis_dis = new DataInputStream(new GZIPInputStream(bis));
+			int item_count = zis_dis.readInt();
+		
+			for(int i = 0; i < item_count; i++) {
+				ItemStack is = new ItemStack();
+				is.read(zis_dis);
+				queue.add(is);
+			}
 		}
 	
 		ArrayList<ItemStack> freq_buffer;
@@ -230,17 +256,18 @@ public class ClientSession {
 	
 		int reject_start = 0;
 		synchronized(freq_buffer) {
-			reject_start = Math.min(Math.max(0,10 - freq_buffer.size()),queue.size());
+			reject_start = Math.min(Math.max(0,100 - freq_buffer.size()),queue.size());
 			freq_buffer.addAll(queue.subList(0,reject_start));
 		}
 	
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		DataOutputStream resp_dos = new DataOutputStream(baos);
+		DataOutputStream resp_dos = new DataOutputStream(new GZIPOutputStream(baos));
 		resp_dos.writeInt(queue.size() - reject_start);
 	
 		for(int i = reject_start; i < queue.size(); i++) {
 			resp_dos.writeInt(i);
 		}
+		resp_dos.close();
 	
 		byte[] bb = baos.toByteArray();
 		int send_length = bb.length;
@@ -278,17 +305,21 @@ public class ClientSession {
 		}
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		DataOutputStream resp_dos = new DataOutputStream(baos);
+		DataOutputStream resp_dos = new DataOutputStream(new GZIPOutputStream(baos));
 		resp_dos.writeInt(queue.size());
 
 		for(ItemStack is : queue) {
 			is.write(resp_dos);
 		}
 
-		resp_dos.flush();
+		resp_dos.close();
 		byte[] bb = baos.toByteArray();
 		soc_dos.writeInt(bb.length);
 		soc_dos.write(bb);
 		soc_dos.flush();
+	}
+	
+	public String getHostName() {
+		return this.host_name;
 	}
 }
